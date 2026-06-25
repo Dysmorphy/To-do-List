@@ -1,7 +1,12 @@
-use colored::Colorize;
+use colored::{ColoredString, Colorize};
 
 use crate::cli::Action;
 use std::fmt;
+
+fn color_string(str:&str) -> ColoredString {
+    let new_str = str.yellow().bold();
+    new_str
+}
 
 enum RenderRequest {
     Added,
@@ -31,8 +36,8 @@ impl Task {
 
 impl fmt::Display for Task {
     fn fmt(&self,f:&mut fmt::Formatter <'_>) -> fmt::Result {
-        let id = format!("{})",self.id).bold().yellow();
-        write!(f,"{} {}",id,self.desc)
+        let id = format!("{})",self.id);
+        write!(f,"{} {}",color_string(&id),self.desc)
     }
 }
 
@@ -49,13 +54,13 @@ impl TaskManager {
     }
     
     pub fn add_task(&mut self,desc:String) {
-        let new_task = Task::new(desc,self.tasks.len() as u32);
+        let new_task = Task::new(desc,(self.tasks.len()+1) as u32);
         self.tasks.push(new_task);
         
     }
 
     fn fix_ids(&mut self) {
-        let mut count:u32 = 0;
+        let mut count:u32 = 1;
         for task in &mut self.tasks {
             task.id = count;
             count+=1;
@@ -81,16 +86,51 @@ impl TaskManager {
         }
     }
     
-    fn render_list (&self) -> String {
-        "132".to_string()
+    pub fn render_list (&self) -> String {
+        let init_str = "List of current tasks:\n".to_string();
+        let mut list_str = color_string(&init_str).to_string();
+        for task in &self.tasks {
+            list_str.push_str(&format!("{}\n",task));
+        }
+        list_str
     }
-    pub fn render(&self,request:RenderRequest) {
+
+    fn render(&self,request:RenderRequest) {
         match request {
             RenderRequest::Added => {
-                //planning to print a message then show the whole list using the format_list 
+                println!("Task successfully added");
+                println!("{}",self.render_list());
             },
 
-            _ => ()
+            RenderRequest::Deleted => {
+               println!("Task successfully deleted");
+               println!("{}",self.render_list());
+            },
+            
+            RenderRequest::NotDeleted => {
+                println!("Failed to delete the task");
+                println!("{}",self.render_list());
+            },
+
+            RenderRequest::Help => {
+                const HELP_MESSAGE:&str = "Usage: todo <command> [arguments]
+Commands:
+  add <task>        Add a new task
+  remove <id>       Remove a task by its ID
+  list              Display all current tasks
+  --help            Show this help message";
+                println!("{}",HELP_MESSAGE);
+            },
+
+            RenderRequest::List => {
+                println!("{}",self.render_list());
+            },
+
+            RenderRequest::Error => {
+                println!("Not a valid command. Try --help for more information");
+            }
+
+
 
 
 
