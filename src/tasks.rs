@@ -1,3 +1,17 @@
+use colored::Colorize;
+
+use crate::cli::Action;
+use std::fmt;
+
+enum RenderRequest {
+    Added,
+    Deleted,
+    NotDeleted,
+    Help,
+    Error,
+    List
+}
+
 #[derive(Debug)]
 #[derive(Clone)]
 pub struct Task {
@@ -6,13 +20,20 @@ pub struct Task {
 }
 
 impl Task {
-    fn new(desc:String,id:u32) -> Self {
+    pub fn new(desc:String,id:u32) -> Self {
         Task {
             desc,
             id
         }
     }
 
+}
+
+impl fmt::Display for Task {
+    fn fmt(&self,f:&mut fmt::Formatter <'_>) -> fmt::Result {
+        let id = format!("{})",self.id).bold().yellow();
+        write!(f,"{} {}",id,self.desc)
+    }
 }
 
 #[derive(Debug)]
@@ -57,6 +78,53 @@ impl TaskManager {
                 Ok(removed_task)
             }
             None => Err("id not found".to_string())
+        }
+    }
+    
+    fn render_list (&self) -> String {
+        "132".to_string()
+    }
+    pub fn render(&self,request:RenderRequest) {
+        match request {
+            RenderRequest::Added => {
+                //planning to print a message then show the whole list using the format_list 
+            },
+
+            _ => ()
+
+
+
+        }
+    }
+
+    pub fn perform_action(&mut self,action:Action) {
+        match action {
+            Action::Add(task_desc) => {
+                self.add_task(task_desc);
+                self.render(RenderRequest::Added)
+            },
+
+            Action::Remove(id) => {
+                let output = self.delete_task(id);
+
+                if let Ok(_task) = output {
+                    self.render(RenderRequest::Deleted);
+                } else {
+                    self.render(RenderRequest::NotDeleted);
+                }
+            },
+
+            Action::Error => {
+                self.render(RenderRequest::Error);
+            },
+
+            Action::Help => {
+                self.render(RenderRequest::Help);
+            }
+
+            Action::List => {
+                self.render(RenderRequest::List);
+            }
         }
     }
     
