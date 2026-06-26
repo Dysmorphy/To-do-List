@@ -2,9 +2,11 @@ use colored::{ColoredString, Colorize};
 
 use crate::cli::Action;
 use std::fmt;
+use serde::{Serialize,Deserialize};
+
 
 fn color_string(str:&str) -> ColoredString {
-    let new_str = str.yellow().bold();
+    let new_str = str.bright_yellow().bold();
     new_str
 }
 
@@ -19,6 +21,8 @@ enum RenderRequest {
 
 #[derive(Debug)]
 #[derive(Clone)]
+#[derive(Serialize)]
+#[derive(Deserialize)]
 pub struct Task {
     desc:String,
     id:u32,
@@ -116,7 +120,7 @@ impl TaskManager {
                 const HELP_MESSAGE:&str = "Usage: todo <command> [arguments]
 Commands:
   add <task>        Add a new task
-  remove <id>       Remove a task by its ID
+  rm <id>       Remove a task by its ID
   list              Display all current tasks
   --help            Show this help message";
                 println!("{}",HELP_MESSAGE);
@@ -166,6 +170,14 @@ Commands:
                 self.render(RenderRequest::List);
             }
         }
+    }
+
+    pub fn import (&mut self,tasks:Vec<Task>) {
+        self.tasks = tasks;  
+    }
+
+    pub fn export (&self) -> &Vec<Task> {
+        &self.tasks
     }
     
 }
