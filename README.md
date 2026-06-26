@@ -8,7 +8,7 @@ A minimal CLI to-do list written in Rust. Tasks persist between sessions via loc
 git clone https://github.com/Dysmorphy/To-do-List
 cd To-do-List
 cargo build --release
-cp target/release/learning_rust /usr/local/bin/todo
+cp target/release/to-do_list /usr/local/bin/todo
 ```
 
 ## Usage
