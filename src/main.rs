@@ -1,12 +1,12 @@
-mod tasks;
 mod cli;
 mod storage;
+mod tasks;
 
 fn main() {
-    let action = cli::parse_args();   
+    let action = cli::parse_args();
     let mut task_list = tasks::TaskManager::new();
     let storage = storage::DataHandler::new();
-    
+
     let read_data = storage.read();
     task_list.import(read_data);
     task_list.perform_action(action);
